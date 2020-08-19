@@ -51,7 +51,7 @@ namespace kTools.Motion
             ConfigureTarget(m_MotionVectorHandle.Identifier(), m_MotionVectorHandle.Identifier());
             cmd.SetRenderTarget(m_MotionVectorHandle.Identifier(), m_MotionVectorHandle.Identifier());
 
-            ConfigureClear(true, true, Color.clear);
+            ConfigureClear(ClearFlag.All, Color.clear);
             // TODO: Why do I have to clear here?
             //cmd.ClearRenderTarget(true, true, Color.black, 1.0f);
         }
