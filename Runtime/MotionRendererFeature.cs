@@ -32,7 +32,7 @@ namespace kTools.Motion
         #endregion
 
         #region Initialization
-        public override OnEnable()
+        public override void OnEnable()
         {
             name = "Motion";
         }
