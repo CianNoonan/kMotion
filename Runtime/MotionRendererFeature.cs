@@ -32,11 +32,6 @@ namespace kTools.Motion
         #endregion
 
         #region Initialization
-        public override void OnEnable()
-        {
-            name = "Motion";
-        }
-
         public override void Create()
         {
             //This ends up forcing the name to 'Motion', you can never rename the feature
