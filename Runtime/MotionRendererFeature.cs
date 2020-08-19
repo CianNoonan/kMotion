@@ -7,18 +7,20 @@ namespace kTools.Motion
 {
     sealed class MotionRendererFeature : ScriptableRendererFeature
     {
-#region Fields
+        #region Fields
+        public bool RecalculatePrevVPWithCurrentP = true;
+
         static MotionRendererFeature s_Instance;
         readonly MotionVectorRenderPass m_MotionVectorRenderPass;
         readonly MotionBlurRenderPass m_MotionBlurRenderPass;
 
         Dictionary<Camera, MotionData> m_MotionDatas;
-        uint  m_FrameCount;
+        uint m_FrameCount;
         float m_LastTime;
         float m_Time;
-#endregion
+        #endregion
 
-#region Constructors
+        #region Constructors
         internal MotionRendererFeature()
         {
             // Set data
@@ -26,23 +28,28 @@ namespace kTools.Motion
             m_MotionVectorRenderPass = new MotionVectorRenderPass();
             m_MotionBlurRenderPass = new MotionBlurRenderPass();
             m_MotionDatas = new Dictionary<Camera, MotionData>();
-        }
-#endregion
-
-#region Initialization
-        public override void Create()
-        {
             name = "Motion";
         }
-#endregion
-        
-#region RenderPass
+        #endregion
+
+        #region Initialization
+        public override void Create()
+        {
+            //This ends up forcing the name to 'Motion', you can never rename the feature
+            //name = "Motion";
+        }
+        #endregion
+
+        #region RenderPass
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
             // Get MotionData
             var camera = renderingData.cameraData.camera;
+            // These flags are still required in SRP or the engine won't compute previous model matrices...
+            camera.depthTextureMode |= DepthTextureMode.MotionVectors | DepthTextureMode.Depth;
+
             MotionData motionData;
-            if(!m_MotionDatas.TryGetValue(camera, out motionData))
+            if (!m_MotionDatas.TryGetValue(camera, out motionData))
             {
                 motionData = new MotionData();
                 m_MotionDatas.Add(camera, motionData);
@@ -65,13 +72,13 @@ namespace kTools.Motion
                 renderer.EnqueuePass(m_MotionBlurRenderPass);
             }
         }
-#endregion
+        #endregion
 
         void CalculateTime()
         {
             // Get data
             float t = Time.realtimeSinceStartup;
-            uint  c = (uint)Time.frameCount;
+            uint c = (uint)Time.frameCount;
 
             // SRP.Render() can be called several times per frame.
             // Also, most Time variables do not consistently update in the Scene View.
@@ -95,7 +102,7 @@ namespace kTools.Motion
             {
                 // Make sure both are never 0.
                 m_LastTime = (m_Time > 0) ? m_Time : t;
-                m_Time  = t;
+                m_Time = t;
             }
         }
 
@@ -105,6 +112,7 @@ namespace kTools.Motion
             // (different Z value ranges etc.)
             var gpuProj = GL.GetGPUProjectionMatrix(camera.projectionMatrix, true); // Had to change this from 'false'
             var gpuView = camera.worldToCameraMatrix;
+
             var gpuVP = gpuProj * gpuView;
 
             // Set last frame data
@@ -112,11 +120,23 @@ namespace kTools.Motion
             if (motionData.lastFrameActive != Time.frameCount)
             {
                 motionData.isFirstFrame = false;
-                motionData.previousViewProjectionMatrix = motionData.isFirstFrame ? 
-                        gpuVP : motionData.viewProjectionMatrix;
+
+                if (RecalculatePrevVPWithCurrentP)
+                {
+                    //Previous View With Current Projection
+                    var prevVP = gpuProj * motionData.viewMatrix;
+                    motionData.previousViewProjectionMatrix = motionData.isFirstFrame ?
+                                           gpuVP : prevVP;
+                }
+                else
+                {
+                    motionData.previousViewProjectionMatrix = motionData.isFirstFrame ?
+                                            gpuVP : motionData.viewProjectionMatrix;
+                }
             }
 
             // Set current frame data
+            motionData.viewMatrix = gpuView;
             motionData.viewProjectionMatrix = gpuVP;
             motionData.lastFrameActive = Time.frameCount;
         }
