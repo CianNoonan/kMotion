@@ -28,11 +28,15 @@ namespace kTools.Motion
             m_MotionVectorRenderPass = new MotionVectorRenderPass();
             m_MotionBlurRenderPass = new MotionBlurRenderPass();
             m_MotionDatas = new Dictionary<Camera, MotionData>();
-            name = "Motion";
         }
         #endregion
 
         #region Initialization
+        public override OnEnable()
+        {
+            name = "Motion";
+        }
+
         public override void Create()
         {
             //This ends up forcing the name to 'Motion', you can never rename the feature
@@ -124,9 +128,8 @@ namespace kTools.Motion
                 if (RecalculatePrevVPWithCurrentP)
                 {
                     //Previous View With Current Projection
-                    var prevVP = gpuProj * motionData.viewMatrix;
-                    motionData.previousViewProjectionMatrix = motionData.isFirstFrame ?
-                                           gpuVP : prevVP;
+                    var prevVP = motionData.isFirstFrame ? gpuVP : gpuProj * motionData.viewMatrix;
+                    motionData.previousViewProjectionMatrix = prevVP;
                 }
                 else
                 {
