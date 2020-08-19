@@ -7,7 +7,7 @@ namespace kTools.Motion
 {
     sealed class MotionVectorRenderPass : ScriptableRenderPass
     {
-#region Fields
+        #region Fields
         const string kCameraShader = "Hidden/kMotion/CameraMotionVectors";
         const string kObjectShader = "Hidden/kMotion/ObjectMotionVectors";
         const string kPreviousViewProjectionMatrix = "_PrevViewProjMatrix";
@@ -24,17 +24,18 @@ namespace kTools.Motion
         Material m_CameraMaterial;
         Material m_ObjectMaterial;
         MotionData m_MotionData;
-#endregion
+        #endregion
 
-#region Constructors
+        #region Constructors
         internal MotionVectorRenderPass()
         {
             // Set data
             renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
+            m_MotionVectorHandle.Init(kMotionVectorTexture);
         }
-#endregion
+        #endregion
 
-#region State
+        #region State
         internal void Setup(MotionData motionData)
         {
             // Set data
@@ -46,24 +47,24 @@ namespace kTools.Motion
         public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
         {
             // Configure Render Target
-            m_MotionVectorHandle.Init(kMotionVectorTexture);
             cmd.GetTemporaryRT(m_MotionVectorHandle.id, cameraTextureDescriptor, FilterMode.Point);
             ConfigureTarget(m_MotionVectorHandle.Identifier(), m_MotionVectorHandle.Identifier());
             cmd.SetRenderTarget(m_MotionVectorHandle.Identifier(), m_MotionVectorHandle.Identifier());
-                
-            // TODO: Why do I have to clear here?
-            cmd.ClearRenderTarget(true, true, Color.black, 1.0f);
-        }
-#endregion
 
-#region Execution
+            ConfigureClear(true, true, Color.clear);
+            // TODO: Why do I have to clear here?
+            //cmd.ClearRenderTarget(true, true, Color.black, 1.0f);
+        }
+        #endregion
+
+        #region Execution
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             // Get data
             var camera = renderingData.cameraData.camera;
 
             // Never draw in Preview
-            if(camera.cameraType == CameraType.Preview)
+            if (camera.cameraType == CameraType.Preview)
                 return;
 
             // Profiling command
@@ -77,7 +78,8 @@ namespace kTools.Motion
 
                 // These flags are still required in SRP or the engine won't compute previous model matrices...
                 // If the flag hasn't been set yet on this camera, motion vectors will skip a frame.
-                camera.depthTextureMode |= DepthTextureMode.MotionVectors | DepthTextureMode.Depth;
+                //Do this in the feature ASAP
+                //camera.depthTextureMode |= DepthTextureMode.MotionVectors | DepthTextureMode.Depth;
 
                 // Drawing
                 DrawCameraMotionVectors(context, cmd, camera);
@@ -103,7 +105,7 @@ namespace kTools.Motion
             {
                 drawingSettings.SetShaderPassName(i, new ShaderTagId(s_ShaderTags[i]));
             }
-            
+
             // Material
             drawingSettings.overrideMaterial = m_ObjectMaterial;
             drawingSettings.overrideMaterialPassIndex = 0;
@@ -130,18 +132,18 @@ namespace kTools.Motion
             var drawingSettings = GetDrawingSettings(ref renderingData);
             var filteringSettings = new FilteringSettings(RenderQueueRange.opaque, camera.cullingMask);
             var renderStateBlock = new RenderStateBlock(RenderStateMask.Nothing);
-            
+
             // Draw Renderers
             context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings, ref renderStateBlock);
         }
-#endregion
+        #endregion
 
-#region Cleanup
+        #region Cleanup
         public override void FrameCleanup(CommandBuffer cmd)
         {
             if (cmd == null)
                 throw new ArgumentNullException("cmd");
-            
+
             // Reset Render Target
             if (m_MotionVectorHandle != RenderTargetHandle.CameraTarget)
             {
@@ -149,14 +151,14 @@ namespace kTools.Motion
                 m_MotionVectorHandle = RenderTargetHandle.CameraTarget;
             }
         }
-#endregion
+        #endregion
 
-#region CommandBufer
+        #region CommandBufer
         void ExecuteCommand(ScriptableRenderContext context, CommandBuffer cmd)
         {
             context.ExecuteCommandBuffer(cmd);
             cmd.Clear();
         }
-#endregion
+        #endregion
     }
 }
