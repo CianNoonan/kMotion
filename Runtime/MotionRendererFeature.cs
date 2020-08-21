@@ -9,6 +9,7 @@ namespace kTools.Motion
     {
         #region Fields
         public bool RecalculatePrevVPWithCurrentP = true;
+        public RenderPassEvent RenderPassEvent = RenderPassEvent.AfterRenderingOpaques;
 
         static MotionRendererFeature s_Instance;
         readonly MotionVectorRenderPass m_MotionVectorRenderPass;
@@ -25,7 +26,7 @@ namespace kTools.Motion
         {
             // Set data
             s_Instance = this;
-            m_MotionVectorRenderPass = new MotionVectorRenderPass();
+            m_MotionVectorRenderPass = new MotionVectorRenderPass(RenderPassEvent);
             m_MotionBlurRenderPass = new MotionBlurRenderPass();
             m_MotionDatas = new Dictionary<Camera, MotionData>();
         }

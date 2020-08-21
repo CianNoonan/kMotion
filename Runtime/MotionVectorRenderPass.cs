@@ -27,10 +27,10 @@ namespace kTools.Motion
         #endregion
 
         #region Constructors
-        internal MotionVectorRenderPass()
+        internal MotionVectorRenderPass(RenderPassEvent rpEvent)
         {
             // Set data
-            renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
+            renderPassEvent = rpEvent;
             m_MotionVectorHandle.Init(kMotionVectorTexture);
         }
         #endregion
