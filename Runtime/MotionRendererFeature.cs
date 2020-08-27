@@ -26,8 +26,6 @@ namespace kTools.Motion
         {
             // Set data
             s_Instance = this;
-            m_MotionVectorRenderPass = new MotionVectorRenderPass(RenderPassEvent);
-            m_MotionBlurRenderPass = new MotionBlurRenderPass();
             m_MotionDatas = new Dictionary<Camera, MotionData>();
         }
         #endregion
@@ -35,6 +33,8 @@ namespace kTools.Motion
         #region Initialization
         public override void Create()
         {
+            m_MotionVectorRenderPass = new MotionVectorRenderPass(RenderPassEvent);
+            m_MotionBlurRenderPass = new MotionBlurRenderPass();
             //This ends up forcing the name to 'Motion', you can never rename the feature
             //name = "Motion";
         }
