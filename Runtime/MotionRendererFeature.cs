@@ -12,8 +12,8 @@ namespace kTools.Motion
         public RenderPassEvent RenderPassEvent = RenderPassEvent.AfterRenderingOpaques;
 
         static MotionRendererFeature s_Instance;
-        readonly MotionVectorRenderPass m_MotionVectorRenderPass;
-        readonly MotionBlurRenderPass m_MotionBlurRenderPass;
+        MotionVectorRenderPass m_MotionVectorRenderPass;
+        MotionBlurRenderPass m_MotionBlurRenderPass;
 
         Dictionary<Camera, MotionData> m_MotionDatas;
         uint m_FrameCount;
