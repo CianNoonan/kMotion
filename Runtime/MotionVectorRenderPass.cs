@@ -32,6 +32,9 @@ namespace kTools.Motion
             // Set data
             renderPassEvent = rpEvent;
             m_MotionVectorHandle.Init(kMotionVectorTexture);
+
+            m_CameraMaterial = new Material(Shader.Find(kCameraShader));
+            m_ObjectMaterial = new Material(Shader.Find(kObjectShader));
         }
         #endregion
 
@@ -40,8 +43,6 @@ namespace kTools.Motion
         {
             // Set data
             m_MotionData = motionData;
-            m_CameraMaterial = new Material(Shader.Find(kCameraShader));
-            m_ObjectMaterial = new Material(Shader.Find(kObjectShader));
         }
 
         public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
