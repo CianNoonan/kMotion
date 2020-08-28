@@ -33,8 +33,8 @@ namespace kTools.Motion
             renderPassEvent = rpEvent;
             m_MotionVectorHandle.Init(kMotionVectorTexture);
 
-            m_CameraMaterial = new Material(Shader.Find(kCameraShader));
-            m_ObjectMaterial = new Material(Shader.Find(kObjectShader));
+            m_CameraMaterial = CoreUtils.CreateEngineMaterial(kCameraShader);
+            m_ObjectMaterial = CoreUtils.CreateEngineMaterial(kObjectShader);
         }
         #endregion
 
