@@ -33,8 +33,8 @@ namespace kTools.Motion
         #region Initialization
         public override void Create()
         {
-            m_MotionVectorRenderPass = new MotionVectorRenderPass(RenderPassEvent);
-            m_MotionBlurRenderPass = new MotionBlurRenderPass();
+            if (m_MotionVectorRenderPass == null) m_MotionVectorRenderPass = new MotionVectorRenderPass(RenderPassEvent);
+            if (m_MotionBlurRenderPass == null) m_MotionBlurRenderPass = new MotionBlurRenderPass();
             //This ends up forcing the name to 'Motion', you can never rename the feature
             //name = "Motion";
         }
